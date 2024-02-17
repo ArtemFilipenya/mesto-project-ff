@@ -1,6 +1,6 @@
 import { createCard, onDelete, addLike} from './card.js';
 import { initialCards } from './cards.js';
-import { toggleModal } from './modal.js';
+import {openModal, closeModal, handleModalClick, handleKeyDown, toggleModal} from './modal.js';
 import '../style.css';
 
 // Получение доступа к основным элементам страницы
@@ -42,8 +42,10 @@ function handleFormSubmitForEdit(evt) {
   evt.preventDefault();
   profileTitle.textContent = nameInput.value;
   profileDescription.textContent = jobInput.value;
-  toggleModal(editProfilePopup);
+  closeModal(editProfilePopup);
 }
+
+formEditProfile.addEventListener('submit', handleFormSubmitForEdit);
 
 // Функция для обработки отправки формы добавления новой карточки
 function handleFormSubmitForAddCard(evt) {
@@ -55,34 +57,14 @@ function handleFormSubmitForAddCard(evt) {
 
 // Функция для добавления карточки, если есть имя и ссылка на изображение
 function addCardToList(cardName, cardLink) {
-  if (cardName && cardLink && cardLink.startsWith('http')) {
-    const cardData = { name: cardName, link: cardLink };
-    // Передаем функцию openImage как аргумент
-    const cardElement = createCard(cardData, onDelete, openImage);
-    cardList.prepend(cardElement);
-  }
+  const cardData = { name: cardName, link: cardLink };
+  // Передаем функцию openImage как аргумент
+  const cardElement = createCard(cardData, onDelete, openImage);
+  cardList.prepend(cardElement);
 }
 
 // Обработчик событий для отправки формы добавления новой карточки
 formNewCard.addEventListener('submit', handleFormSubmitForAddCard);
-
-// Обработчик кликов для модальных окон, закрывающий их при клике на оверлей
-function handleModalClick(evt) {
-  if (evt.target.classList.contains('popup')) {
-    toggleModal(evt.target);
-  }
-}
-
-// Обработчик нажатий клавиш для закрытия модальных окон
-function handleKeyDown(evt) {
-  if (evt.key === 'Escape') {
-    popups.forEach(popup => {
-      if (popup.classList.contains('popup_opened')) {
-        toggleModal(popup);
-      }
-    });
-  }
-}
 
 // Добавление обработчиков событий клика для кнопок открытия модальных окон
 buttonOpenEditProfilePopup.addEventListener('click', () => toggleModal(editProfilePopup));
@@ -99,4 +81,13 @@ formEditProfile.addEventListener('submit', handleFormSubmitForEdit);
 // Обработчики событий для закрытия модальных окон при нажатии клавиш
 document.addEventListener('keydown', handleKeyDown);
 
-export {openImagePopup, popupImage, imageTitle}
+// Добавление обработчика события, который выполнится после полной загрузки контента DOM
+document.addEventListener('DOMContentLoaded', () => {
+  const cardsContainer = document.querySelector('.places__list');
+  // Добавление карточек из начального набора данных
+  initialCards.forEach(cardData => {
+    const cardElement = createCard(cardData, onDelete);
+    cardsContainer.append(cardElement);
+  });
+});
+
