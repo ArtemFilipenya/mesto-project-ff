@@ -56,7 +56,7 @@ function onDelete(cardId) {
     // Отправляем DELETE-запрос для удаления карточки по её идентификатору
     return fetch(`${config.baseUrl}/cards/${cardId}`, {
         headers: config.headers,
-        method: 'DELETE', 
+        method: 'DELETE',
     }).then(res => handleResponse(res));
 }
 
@@ -97,11 +97,11 @@ function newAvatar(link) {
 export {
     addLike,
     deleteLike,
-	onDelete,
-	likesCounter,
-	getInitialCards,
-	getProfileInfo,
-	newAvatar,
-	newCard,
-	updateProfileInfo,
+    onDelete,
+    likesCounter,
+    getInitialCards,
+    getProfileInfo,
+    newAvatar,
+    newCard,
+    updateProfileInfo,
 };

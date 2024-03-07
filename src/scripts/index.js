@@ -1,16 +1,16 @@
 import {createCard, deleteCard, likeHandler} from './card.js';
 import { initialCards } from './cards.js';
 import {openModal, closeModal, handleModalClick, handleKeyDown} from './modal.js';
-import {clearValidation, enableValidation, checkInputValidity} from './validation.js';
+import {clearValidation, enableValidation} from './validation.js';
 import {addLike,
-	deleteLike,
-	onDelete,
-	likesCounter,
-	getInitialCards,
-	getProfileInfo,
-	newAvatar,
-	newCard,
-	updateProfileInfo} from './api.js';
+  deleteLike,
+  onDelete,
+  likesCounter,
+  getInitialCards,
+  getProfileInfo,
+  newAvatar,
+  newCard,
+  updateProfileInfo} from './api.js';
 import '../style.css';
 
 const pageContent = document.querySelector('.page__content');
@@ -63,7 +63,7 @@ function renderLoading(isLoading, buttonElement) {
   if (isLoading) {
     buttonElement.textContent = 'Сохранение...';
   } else {
-    buttonElement.textContent = '';
+    buttonElement.textContent = 'Сохранить';
   }
 }
 
@@ -78,32 +78,30 @@ function handleFormSubmitForEdit(evt) {
   evt.preventDefault();
   renderLoading(true, submitEditProfileButton);
   updateProfileInfo(nameInput.value, jobInput.value)
-    .then((userInfo) => {
-      profileTitle.textContent = userInfo.name;
-      profileDescription.textContent = userInfo.about;
-      closeModal(editProfilePopup);
-    })
-    .catch((err) => console.error(err))
-    .finally(() => renderLoading(false, buttonOpenEditProfilePopup));
+      .then((userInfo) => {
+        profileTitle.textContent = userInfo.name;
+        profileDescription.textContent = userInfo.about;
+        closeModal(editProfilePopup);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => renderLoading(false, submitEditProfileButton));
 }
 
 function handleFormSubmitForAddCard(evt) {
   evt.preventDefault();
   renderLoading(true, submitAddCardButton);
   newCard(cardName.value, cardLink.value)
-    .then((card) => {
-      cardList.prepend(createCard(card, onDelete, addLike, openImage));
-      closeModal(addCardPopup);
-      formNewCard.reset();
-    })
-    .catch((err) => console.error(err))
-    .finally(() => renderLoading(false, buttonOpenAddCardPopup));
+      .then((card) => {
+        cardList.prepend(createCard(card, onDelete, addLike, openImage, myId));
+        closeModal(addCardPopup);
+        formNewCard.reset();
+      })
+      .catch((err) => console.error(err))
+      .finally(() => renderLoading(false, submitAddCardButton));
 }
 
 // Функция для добавления обработчиков событий смены аватара
 function setupAvatarChange() {
-  // Очистка сообщений валидации и начальное состояние формы
-  clearValidation(avatarForm, validationConfig);
   // Добавление валидации
   enableValidation(validationConfig);
   profileAvatar.addEventListener('click', () => {
@@ -112,39 +110,39 @@ function setupAvatarChange() {
   });
   avatarForm.addEventListener('submit', function (event) {
     event.preventDefault();
-    if (!avatarLinkInput.validity.valid) {
-      checkInputValidity(avatarForm, avatarLinkInput);
-    } else {
+    const isFormInvalid = avatarForm.querySelector(`.${validationConfig.inputErrorClass}`);
+
+    if (!isFormInvalid) {
       renderLoading(true, avatarSubmitButton);
       newAvatar(avatarLinkInput.value)
-        .then((res) => {
-          profileAvatar.style.backgroundImage = `url('${res.avatar}')`;
-          closeModal(avatarPopup);
-        })
-        .catch((err) => {
-          console.error(err);
-        })
-        .finally(() => {
-          renderLoading(false, avatarSubmitButton);
-        });
+          .then((res) => {
+            profileAvatar.style.backgroundImage = `url('${res.avatar}')`;
+            closeModal(avatarPopup);
+          })
+          .catch((err) => {
+            console.error(err);
+          })
+          .finally(() => {
+            renderLoading(false, avatarSubmitButton);
+          });
     }
   });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   Promise.all([getProfileInfo(), getInitialCards()])
-  .then(([userData, initialCards]) => {
-  myId = userData[`_id`];
-  profileTitle.textContent = userData.name;
-  profileDescription.textContent = userData.about;
-  initialCards.forEach((cardData) => {
-  const cardElement = createCard(cardData, openImage, myId);
-  cardList.append(cardElement);
-  });
-  })
-  .catch((err) => {
-  console.error(err);
-  });
+      .then(([userData, initialCards]) => {
+        myId = userData[`_id`];
+        profileTitle.textContent = userData.name;
+        profileDescription.textContent = userData.about;
+        initialCards.forEach((cardData) => {
+          const cardElement = createCard(cardData, openImage, myId);
+          cardList.append(cardElement);
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   setupAvatarChange();
 });
 

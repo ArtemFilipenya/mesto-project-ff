@@ -11,16 +11,16 @@ function closeModal(popup) {
 function handleModalClick(evt) {
 	// для обработки кликов по оверлею
 	if (evt.target.classList.contains('popup') || evt.target.classList.contains('popup__overlay')) {
-	  closeModal(evt.target.closest('.popup'));
+		closeModal(evt.target.closest('.popup'));
 	}
 }
 
 function handleKeyDown(evt) {
 	if (evt.key === 'Escape') {
-	  const openedPopup = document.querySelector('.popup_is-opened');
-	  if (openedPopup) {
-		closeModal(openedPopup);
-	  }
+		const openedPopup = document.querySelector('.popup_is-opened');
+		if (openedPopup) {
+			closeModal(openedPopup);
+		}
 	}
 }
 
