@@ -4,6 +4,27 @@ import { addLike, deleteLike, onDelete } from './api.js';
 // Получение шаблона карточки
 const cardTemplate = document.querySelector('#card-template').content;
 
+const deleteCard = (cardId, deleteButton) => {
+    onDelete(cardId)
+        .then(() => {
+            const cardElement = deleteButton.closest('.card');
+            cardElement.remove();
+        })
+        .catch(err => console.log(err));
+}
+
+const likeCard = (cardId, likeButton, likesCounter) => {
+    const isLiked = likeButton.classList.contains('card__like-button_is-active');
+    const likeMethod = isLiked ? deleteLike : addLike;
+
+    likeMethod(cardId)
+        .then(data => {
+            likeButton.classList.toggle('card__like-button_is-active');
+            likesCounter.textContent = data.likes.length;
+        })
+        .catch(err => console.log(err));
+}
+
 // Функция для создания карточки
 function createCard(item, openImage, myId) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
@@ -22,33 +43,16 @@ function createCard(item, openImage, myId) {
     setDeleteButton(item, myId, deleteButton);
 
     // Обработчик удаления карточки
-    deleteButton.addEventListener('click', () => {
-        onDelete(item._id)
-            .then(() => {
-                const cardElement = deleteButton.closest('.card');
-                cardElement.remove();
-            })
-            .catch(err => console.log(err));
-    });
+    deleteButton.addEventListener('click', () => { deleteCard(item._id, deleteButton) });
 
     // Обработчик лайка карточки
-    likeButton.addEventListener('click', () => {
-        const likeMethod = likeButton.classList.contains('card__like-button_is-active') ? deleteLike : addLike;
-        likeMethod(item._id)
-            .then(data => {
-                likeButton.classList.toggle('card__like-button_is-active');
-                likesCounter.textContent = data.likes.length;
-            })
-            .catch(err => console.log(err));
-    });
+    likeButton.addEventListener('click', () => { likeCard(item._id, likeButton, likesCounter) });
 
     // Обработчик открытия изображения
     cardImage.addEventListener('click', () => openImage(item.name, item.link));
 
     return cardElement;
 }
-
-export { createCard };
 
 // Функция установки кнопки удаления
 function setDeleteButton(card, myId, deleteButton) {
@@ -58,3 +62,5 @@ function setDeleteButton(card, myId, deleteButton) {
         deleteButton.style.display = 'none'; // Скрыть кнопку
     }
 }
+
+export { createCard };
