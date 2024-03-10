@@ -1,16 +1,16 @@
-import {createCard, deleteCard, likeHandler} from './card.js';
+import {createCard, deleteCard, likeCard} from './card.js';
 import { initialCards } from './cards.js';
 import {openModal, closeModal, handleModalClick, handleKeyDown} from './modal.js';
 import {clearValidation, enableValidation} from './validation.js';
 import {addLike,
-  deleteLike,
-  onDelete,
-  likesCounter,
-  getInitialCards,
-  getProfileInfo,
-  newAvatar,
-  newCard,
-  updateProfileInfo} from './api.js';
+    deleteLike,
+    onDelete,
+    likesCounter,
+    getInitialCards,
+    getProfileInfo,
+    newAvatar,
+    newCard,
+    updateProfileInfo} from './api.js';
 import '../style.css';
 
 const pageContent = document.querySelector('.page__content');
@@ -49,129 +49,129 @@ let myId = '';
 
 // Валидация форм
 const validationConfig = {
-  formSelector: '.popup__form',
-  inputSelector: '.popup__input',
-  submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible',
+    formSelector: '.popup__form',
+    inputSelector: '.popup__input',
+    submitButtonSelector: '.popup__button',
+    inactiveButtonClass: 'popup__button_disabled',
+    inputErrorClass: 'popup__input_type_error',
+    errorClass: 'popup__error_visible',
 };
 
 enableValidation(validationConfig);
 
 function renderLoading(isLoading, buttonElement) {
-  if (isLoading) {
-    buttonElement.textContent = 'Сохранение...';
-  } else {
-    buttonElement.textContent = 'Сохранить';
-  }
+    if (isLoading) {
+        buttonElement.textContent = 'Сохранение...';
+    } else {
+        buttonElement.textContent = 'Сохранить';
+    }
 }
 
 function openImage(cardName, cardLink) {
-  openModal(openImagePopup);
-  popupImage.src = cardLink;
-  popupImage.alt = cardName;
-  imageTitle.textContent = cardName;
+    openModal(openImagePopup);
+    popupImage.src = cardLink;
+    popupImage.alt = cardName;
+    imageTitle.textContent = cardName;
 }
 
 function handleFormSubmitForEdit(evt) {
-  evt.preventDefault();
-  renderLoading(true, submitEditProfileButton);
-  updateProfileInfo(nameInput.value, jobInput.value)
-      .then((userInfo) => {
-        profileTitle.textContent = userInfo.name;
-        profileDescription.textContent = userInfo.about;
-        closeModal(editProfilePopup);
-      })
-      .catch((err) => console.error(err))
-      .finally(() => renderLoading(false, submitEditProfileButton));
+    evt.preventDefault();
+    renderLoading(true, submitEditProfileButton);
+    updateProfileInfo(nameInput.value, jobInput.value)
+        .then((userInfo) => {
+            profileTitle.textContent = userInfo.name;
+            profileDescription.textContent = userInfo.about;
+            closeModal(editProfilePopup);
+        })
+        .catch((err) => console.error(err))
+        .finally(() => renderLoading(false, submitEditProfileButton));
 }
 
 function handleFormSubmitForAddCard(evt) {
-  evt.preventDefault();
-  renderLoading(true, submitAddCardButton);
-  newCard(cardName.value, cardLink.value)
-      .then((card) => {
-        cardList.prepend(createCard(card, onDelete, addLike, openImage, myId));
-        closeModal(addCardPopup);
-        formNewCard.reset();
-      })
-      .catch((err) => console.error(err))
-      .finally(() => renderLoading(false, submitAddCardButton));
+    evt.preventDefault();
+    renderLoading(true, submitAddCardButton);
+    newCard(cardName.value, cardLink.value)
+        .then((card) => {
+            cardList.prepend(createCard(card, deleteCard, likeCard, openImage, myId));
+            closeModal(addCardPopup);
+            formNewCard.reset();
+        })
+        .catch((err) => console.error(err))
+        .finally(() => renderLoading(false, submitAddCardButton));
 }
 
 // Функция для добавления обработчиков событий смены аватара
 function setupAvatarChange() {
-  // Добавление валидации
-  enableValidation(validationConfig);
-  profileAvatar.addEventListener('click', () => {
-    clearValidation(avatarForm, validationConfig);
-    openModal(avatarPopup);
-  });
-  avatarForm.addEventListener('submit', function (event) {
-    event.preventDefault();
-    const isFormInvalid = avatarForm.querySelector(`.${validationConfig.inputErrorClass}`);
+    // Добавление валидации
+    enableValidation(validationConfig);
+    profileAvatar.addEventListener('click', () => {
+        clearValidation(avatarForm, validationConfig);
+        openModal(avatarPopup);
+    });
+    avatarForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const isFormInvalid = avatarForm.querySelector(`.${validationConfig.inputErrorClass}`);
 
-    if (!isFormInvalid) {
-      renderLoading(true, avatarSubmitButton);
-      newAvatar(avatarLinkInput.value)
-          .then((res) => {
-            profileAvatar.style.backgroundImage = `url('${res.avatar}')`;
-            closeModal(avatarPopup);
-          })
-          .catch((err) => {
-            console.error(err);
-          })
-          .finally(() => {
-            renderLoading(false, avatarSubmitButton);
-          });
-    }
-  });
+        if (!isFormInvalid) {
+            renderLoading(true, avatarSubmitButton);
+            newAvatar(avatarLinkInput.value)
+                .then((res) => {
+                    profileAvatar.style.backgroundImage = `url('${res.avatar}')`;
+                    closeModal(avatarPopup);
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
+                .finally(() => {
+                    renderLoading(false, avatarSubmitButton);
+                });
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  Promise.all([getProfileInfo(), getInitialCards()])
-      .then(([userData, initialCards]) => {
-        myId = userData[`_id`];
-        profileTitle.textContent = userData.name;
-        profileDescription.textContent = userData.about;
-        initialCards.forEach((cardData) => {
-          const cardElement = createCard(cardData, openImage, myId);
-          cardList.append(cardElement);
+    Promise.all([getProfileInfo(), getInitialCards()])
+        .then(([userData, initialCards]) => {
+            myId = userData[`_id`];
+            profileTitle.textContent = userData.name;
+            profileDescription.textContent = userData.about;
+            initialCards.forEach((cardData) => {
+                const cardElement = createCard(cardData, deleteCard, likeCard, openImage, myId);
+                cardList.append(cardElement);
+            });
+        })
+        .catch((err) => {
+            console.error(err);
         });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  setupAvatarChange();
+    setupAvatarChange();
 });
 
 buttonOpenEditProfilePopup.addEventListener('click', () => {
-  clearValidation(formEditProfile, validationConfig);
-  nameInput.value = profileTitle.textContent;
-  jobInput.value = profileDescription.textContent;
-  openModal(editProfilePopup);
+    clearValidation(formEditProfile, validationConfig);
+    nameInput.value = profileTitle.textContent;
+    jobInput.value = profileDescription.textContent;
+    openModal(editProfilePopup);
 });
 
 buttonOpenAddCardPopup.addEventListener('click', () => {
-  clearValidation(formNewCard, validationConfig);
-  formNewCard.reset();
-  openModal(addCardPopup);
+    clearValidation(formNewCard, validationConfig);
+    formNewCard.reset();
+    openModal(addCardPopup);
 });
 
 formEditProfile.addEventListener('submit', handleFormSubmitForEdit);
 formNewCard.addEventListener('submit', handleFormSubmitForAddCard);
 avatarForm.addEventListener('submit', setupAvatarChange);
 popups.forEach((popup) => {
-  popup.addEventListener('click', handleModalClick);
+    popup.addEventListener('click', handleModalClick);
 });
 
 
 // Добавление обработчика событий для кнопок закрытия модальных окон
 closeButtons.forEach(button => {
-  button.addEventListener('click', (event) => {
-    // Найти ближайшее модальное окно, которое содержит кнопку закрытия
-    const popup = button.closest('.popup');
-    closeModal(popup);
-  });
+    button.addEventListener('click', (event) => {
+        // Найти ближайшее модальное окно, которое содержит кнопку закрытия
+        const popup = button.closest('.popup');
+        closeModal(popup);
+    });
 });

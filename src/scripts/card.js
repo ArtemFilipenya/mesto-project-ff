@@ -34,6 +34,7 @@ function createCard(item, onDelete, addLike, openImage, myId) {
     const likeButton = cardElement.querySelector('.card__like-button');
     const likesCounter = cardElement.querySelector('.card__likes-counter');
 
+
     likesCounter.textContent = item.likes.length;
     cardImage.src = item.link;
     cardImage.alt = item.name;
@@ -43,10 +44,11 @@ function createCard(item, onDelete, addLike, openImage, myId) {
     setDeleteButton(item, myId, deleteButton);
 
     // Обработчик удаления карточки
-    deleteButton.addEventListener('click', () => { deleteCard(item._id, deleteButton) });
+    deleteButton.addEventListener('click', () => { onDelete(item._id, deleteButton) });
+
 
     // Обработчик лайка карточки
-    likeButton.addEventListener('click', () => { likeCard(item._id, likeButton, likesCounter) });
+    likeButton.addEventListener('click', () => { addLike(item._id, likeButton, likesCounter) });
 
     // Обработчик открытия изображения
     cardImage.addEventListener('click', () => openImage(item.name, item.link));
@@ -63,4 +65,4 @@ function setDeleteButton(card, myId, deleteButton) {
     }
 }
 
-export { createCard };
+export { createCard, deleteCard, likeCard};
