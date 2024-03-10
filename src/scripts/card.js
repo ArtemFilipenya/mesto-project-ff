@@ -26,7 +26,7 @@ const likeCard = (cardId, likeButton, likesCounter) => {
 }
 
 // Функция для создания карточки
-function createCard(item, openImage, myId) {
+function createCard(item, onDelete, addLike, openImage, myId) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image');
     const cardTitle = cardElement.querySelector('.card__title');
